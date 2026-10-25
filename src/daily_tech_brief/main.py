@@ -114,6 +114,51 @@ def cmd_test_delivery(coordinator: WorkflowCoordinator, args: argparse.Namespace
     return 0 if (tg_code == 0 and em_code == 0) else 1
 
 
+def cmd_test_llm(coordinator: WorkflowCoordinator, args: argparse.Namespace) -> int:
+    """Test LLM summarization with the configured provider and API key."""
+    settings = coordinator.settings
+    if not settings.llm_api_key:
+        print("ERROR: LLM_API_KEY is not set in .env.")
+        print("Please set ENABLE_LLM_SUMMARIES=true and LLM_API_KEY=your_key in .env to test AI summarization.")
+        return 1
+
+    print(f"Testing {settings.llm_provider.upper()} summarization using model '{settings.llm_model}'...")
+    from daily_tech_brief.models import Article
+    from daily_tech_brief.summarizer import LLMSummarizer
+
+    test_article = Article(
+        id="test_ai_art",
+        canonical_url="https://example.com/deepseek-r1",
+        original_url="https://example.com/deepseek-r1",
+        title="DeepSeek Releases DeepSeek-R1 Open Reasoning Model",
+        description="DeepSeek has officially released the weights and technical report for DeepSeek-R1, demonstrating competitive mathematical and coding reasoning benchmarks compared to proprietary models, trained using reinforcement learning.",
+        source_id="test",
+        source_name="AI Research News",
+        categories=["ai_and_llms"],
+    )
+
+    summarizer = LLMSummarizer(
+        provider=settings.llm_provider,
+        api_key=settings.llm_api_key,
+        model=settings.llm_model,
+    )
+
+    try:
+        res = summarizer.summarize(test_article)
+        print("\n" + "=" * 50)
+        print("✓ AI Summarization Succeeded!")
+        print("=" * 50)
+        print(f"Summary:           {res.get('summary')}")
+        print(f"Why it matters:    {res.get('why_it_matters')}")
+        if res.get("technical_context"):
+            print(f"Technical Context: {res.get('technical_context')}")
+        print("=" * 50 + "\n")
+        return 0
+    except Exception as e:
+        print(f"\n✗ AI Summarization failed: {e}")
+        return 1
+
+
 def cmd_sources(coordinator: WorkflowCoordinator, args: argparse.Namespace) -> int:
     """List configured feeds and their latest fetch status."""
     sources = coordinator.sources_registry.sources
@@ -208,6 +253,7 @@ def build_parser() -> argparse.ArgumentParser:
     subparsers.add_parser("test-telegram", help="Send a Telegram test message")
     subparsers.add_parser("test-email", help="Send an email test message")
     subparsers.add_parser("test-delivery", help="Test both Telegram and email channels")
+    subparsers.add_parser("test-llm", help="Test LLM AI summarization")
 
     # sources
     subparsers.add_parser("sources", help="List configured feeds and their statuses")
@@ -237,6 +283,7 @@ def main(argv: Optional[List[str]] = None) -> int:
         "test-telegram": cmd_test_telegram,
         "test-email": cmd_test_email,
         "test-delivery": cmd_test_delivery,
+        "test-llm": cmd_test_llm,
         "sources": cmd_sources,
         "retry-failed": cmd_retry_failed,
         "health": cmd_health,
