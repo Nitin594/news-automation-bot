@@ -1,0 +1,282 @@
+# ==============================================================================
+# Daily Tech Brief - Feeds and Categories Configuration
+# Adding or disabling an RSS feed does NOT require modifying any Python code.
+# ==============================================================================
+
+categories:
+  - id: ai_and_llms
+    name: "AI & LLMs"
+    weight: 1.2
+    description: "Foundation models, LLMs, AI agents, inference, multimodal AI, AI infrastructure"
+    keywords:
+      - "llm"
+      - "large language model"
+      - "foundation model"
+      - "gpt-4"
+      - "claude"
+      - "gemini"
+      - "llama"
+      - "mistral"
+      - "deepseek"
+      - "ai agent"
+      - "multi-agent"
+      - "reasoning model"
+      - "transformer"
+      - "fine-tuning"
+      - "lora"
+      - "rag"
+      - "retrieval-augmented"
+      - "inference"
+      - "vllm"
+      - "ollama"
+      - "diffusion model"
+      - "neural network"
+      - "generative ai"
+      - "openai"
+      - "anthropic"
+
+  - id: software_dev
+    name: "Software Development"
+    weight: 1.1
+    description: "Languages, web/backend systems, developer tools, distributed systems, DevOps"
+    keywords:
+      - "python"
+      - "rust"
+      - "golang"
+      - "typescript"
+      - "javascript"
+      - "c++"
+      - "react"
+      - "next.js"
+      - "node.js"
+      - "postgres"
+      - "database"
+      - "distributed systems"
+      - "docker"
+      - "kubernetes"
+      - "compiler"
+      - "linux"
+      - "api"
+      - "developer tool"
+      - "framework"
+      - "architecture"
+      - "concurrency"
+      - "performance"
+
+  - id: cybersecurity
+    name: "Cybersecurity Watch"
+    weight: 1.15
+    description: "Vulnerabilities, CVEs, supply-chain security, malware, patches, cloud security"
+    keywords:
+      - "cve"
+      - "vulnerability"
+      - "zero-day"
+      - "exploit"
+      - "rce"
+      - "supply chain attack"
+      - "ransomware"
+      - "malware"
+      - "data breach"
+      - "security advisory"
+      - "patch"
+      - "infosec"
+      - "cisa"
+      - "cryptography"
+      - "backdoor"
+      - "privilege escalation"
+
+  - id: internships_and_hackathons
+    name: "Internships & Opportunities"
+    weight: 1.25
+    description: "Student developer programs, internships, hackathons, fellowships, mentorships"
+    keywords:
+      - "internship"
+      - "intern"
+      - "hackathon"
+      - "fellowship"
+      - "student program"
+      - "early career"
+      - "new grad"
+      - "google summer of code"
+      - "gsoc"
+      - "lfx mentorship"
+      - "outreachy"
+      - "bounty"
+      - "grant"
+      - "application deadline"
+      - "scholarship"
+
+  - id: startups_and_industry
+    name: "Big Tech & Startups"
+    weight: 1.0
+    description: "Major tech company updates, startup funding, acquisitions, tech business trends"
+    keywords:
+      - "startup"
+      - "funding"
+      - "seed round"
+      - "series a"
+      - "series b"
+      - "venture capital"
+      - "acquisition"
+      - "acquired"
+      - "ipo"
+      - "nvidia"
+      - "google"
+      - "microsoft"
+      - "apple"
+      - "meta"
+      - "amazon"
+      - "semiconductor"
+      - "tsmc"
+
+  - id: research_and_opensource
+    name: "Research & Open Source"
+    weight: 1.1
+    description: "ArXiv preprints, research papers, GitHub releases, benchmarks, datasets"
+    keywords:
+      - "arxiv"
+      - "paper"
+      - "research"
+      - "preprint"
+      - "benchmark"
+      - "dataset"
+      - "open source"
+      - "github release"
+      - "repository"
+      - "state-of-the-art"
+      - "sota"
+      - "eval"
+      - "ablation"
+
+# Topics to down-rank or filter out to avoid clutter
+excluded_topics:
+  - "crypto pump"
+  - "nft drop"
+  - "sponsored content"
+  - "giveaway"
+  - "discount code"
+  - "casino"
+  - "horoscope"
+
+# Configured news feeds
+feeds:
+  - id: arxiv_ai
+    name: "arXiv Artificial Intelligence"
+    url: "https://rss.arxiv.org/rss/cs.AI"
+    source_type: "rss"
+    categories: ["ai_and_llms", "research_and_opensource"]
+    reliability_weight: 90.0
+    enabled: true
+    timeout_seconds: 15
+    attribution: "arXiv.org cs.AI"
+    is_opportunity_source: false
+
+  - id: arxiv_ml
+    name: "arXiv Machine Learning"
+    url: "https://rss.arxiv.org/rss/cs.LG"
+    source_type: "rss"
+    categories: ["ai_and_llms", "research_and_opensource"]
+    reliability_weight: 90.0
+    enabled: true
+    timeout_seconds: 15
+    attribution: "arXiv.org cs.LG"
+    is_opportunity_source: false
+
+  - id: arxiv_cl
+    name: "arXiv Computation & Language"
+    url: "https://rss.arxiv.org/rss/cs.CL"
+    source_type: "rss"
+    categories: ["ai_and_llms", "research_and_opensource"]
+    reliability_weight: 90.0
+    enabled: true
+    timeout_seconds: 15
+    attribution: "arXiv.org cs.CL"
+    is_opportunity_source: false
+
+  - id: huggingface_blog
+    name: "Hugging Face Blog"
+    url: "https://huggingface.co/blog/feed.xml"
+    source_type: "atom"
+    categories: ["ai_and_llms", "research_and_opensource", "software_dev"]
+    reliability_weight: 95.0
+    enabled: true
+    timeout_seconds: 15
+    attribution: "Hugging Face"
+    is_opportunity_source: false
+
+  - id: github_blog
+    name: "GitHub Engineering & Product Blog"
+    url: "https://github.blog/feed/"
+    source_type: "rss"
+    categories: ["software_dev", "research_and_opensource"]
+    reliability_weight: 92.0
+    enabled: true
+    timeout_seconds: 15
+    attribution: "GitHub Blog"
+    is_opportunity_source: false
+
+  - id: hnrss_frontpage
+    name: "Hacker News (HNRSS Top Stories)"
+    url: "https://hnrss.org/frontpage"
+    source_type: "rss"
+    categories: ["software_dev", "ai_and_llms", "startups_and_industry"]
+    reliability_weight: 85.0
+    enabled: true
+    timeout_seconds: 15
+    attribution: "Hacker News"
+    is_opportunity_source: false
+
+  - id: cisa_advisories
+    name: "CISA Cybersecurity Advisories"
+    url: "https://www.cisa.gov/cybersecurity-advisories/all.xml"
+    source_type: "rss"
+    categories: ["cybersecurity"]
+    reliability_weight: 98.0
+    enabled: true
+    timeout_seconds: 15
+    attribution: "CISA US-CERT"
+    is_opportunity_source: false
+
+  - id: the_hackers_news
+    name: "The Hacker News"
+    url: "https://feeds.feedburner.com/TheHackersNews"
+    source_type: "rss"
+    categories: ["cybersecurity"]
+    reliability_weight: 88.0
+    enabled: true
+    timeout_seconds: 15
+    attribution: "The Hacker News"
+    is_opportunity_source: false
+
+  - id: techcrunch
+    name: "TechCrunch"
+    url: "https://techcrunch.com/feed/"
+    source_type: "rss"
+    categories: ["startups_and_industry", "ai_and_llms"]
+    reliability_weight: 82.0
+    enabled: true
+    timeout_seconds: 15
+    attribution: "TechCrunch"
+    is_opportunity_source: false
+
+  - id: simon_willison
+    name: "Simon Willison's Weblog"
+    url: "https://simonwillison.net/atom/everything/"
+    source_type: "atom"
+    categories: ["software_dev", "ai_and_llms"]
+    reliability_weight: 90.0
+    enabled: true
+    timeout_seconds: 15
+    attribution: "Simon Willison"
+    is_opportunity_source: false
+
+  - id: google_opensource
+    name: "Google Open Source Blog"
+    url: "https://opensource.googleblog.com/feeds/posts/default?alt=rss"
+    source_type: "rss"
+    categories: ["research_and_opensource", "software_dev", "internships_and_hackathons"]
+    reliability_weight: 90.0
+    enabled: true
+    timeout_seconds: 15
+    attribution: "Google Open Source"
+    is_opportunity_source: false

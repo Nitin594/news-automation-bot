@@ -1,0 +1,83 @@
+name: Daily Tech Brief Digest
+
+on:
+  schedule:
+    # 03:30 UTC every day corresponds exactly to 09:00 AM IST (Asia/Kolkata, UTC+05:30)
+    # Note: GitHub Actions cron operates exclusively in UTC.
+    - cron: '30 3 * * *'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run preview only (do not send messages)'
+        required: false
+        type: boolean
+        default: false
+      force:
+        description: 'Force execution even if already completed today'
+        required: false
+        type: boolean
+        default: false
+
+concurrency:
+  group: daily-tech-brief-execution
+  cancel-in-progress: false
+
+jobs:
+  digest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Restore SQLite database state
+        uses: actions/cache@v4
+        with:
+          path: data/
+          key: daily-brief-db-${{ github.run_id }}
+          restore-keys: |
+            daily-brief-db-
+
+      - name: Run Daily Tech Brief
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          EMAIL_HOST: ${{ secrets.EMAIL_HOST || 'smtp.gmail.com' }}
+          EMAIL_PORT: ${{ secrets.EMAIL_PORT || '587' }}
+          EMAIL_USERNAME: ${{ secrets.EMAIL_USERNAME }}
+          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+          EMAIL_SENDER: ${{ secrets.EMAIL_SENDER }}
+          EMAIL_RECIPIENT: ${{ secrets.EMAIL_RECIPIENT }}
+          TIMEZONE: 'Asia/Kolkata'
+          DIGEST_LIMIT: '10'
+          LOOKBACK_HOURS: '24'
+          FALLBACK_LOOKBACK_HOURS: '48'
+          ENABLE_LLM_SUMMARIES: ${{ secrets.ENABLE_LLM_SUMMARIES || 'false' }}
+          LLM_PROVIDER: ${{ secrets.LLM_PROVIDER || 'gemini' }}
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+          LLM_MODEL: ${{ secrets.LLM_MODEL || 'gemini-1.5-flash' }}
+          DATABASE_PATH: 'data/daily_tech_brief.db'
+          LOG_LEVEL: 'INFO'
+        run: |
+          FLAGS=""
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            FLAGS="$FLAGS --dry-run"
+          fi
+          if [ "${{ inputs.force }}" = "true" ]; then
+            FLAGS="$FLAGS --force"
+          fi
+          python main.py run $FLAGS
