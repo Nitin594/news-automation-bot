@@ -45,11 +45,11 @@ class Settings:
     telegram_chat_id: str = field(default_factory=lambda: os.getenv("TELEGRAM_CHAT_ID", "").strip())
 
     # Email / SMTP
-    email_host: str = field(default_factory=lambda: os.getenv("EMAIL_HOST", "smtp.gmail.com").strip())
-    email_port: int = field(default_factory=lambda: int(os.getenv("EMAIL_PORT", "587")))
+    email_host: str = field(default_factory=lambda: (os.getenv("EMAIL_HOST") or "smtp.gmail.com").strip())
+    email_port: int = field(default_factory=lambda: int(os.getenv("EMAIL_PORT") or "587"))
     email_username: str = field(default_factory=lambda: os.getenv("EMAIL_USERNAME", "").strip())
     email_password: str = field(default_factory=lambda: os.getenv("EMAIL_PASSWORD", "").strip())
-    email_sender: str = field(default_factory=lambda: os.getenv("EMAIL_SENDER", "").strip())
+    email_sender: str = field(default_factory=lambda: (os.getenv("EMAIL_SENDER") or os.getenv("EMAIL_USERNAME") or "").strip())
     email_recipient: str = field(default_factory=lambda: os.getenv("EMAIL_RECIPIENT", "").strip())
 
     # Timezone & Schedule
