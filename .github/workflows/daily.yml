@@ -44,6 +44,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Ensure data directory exists
+        run: mkdir -p data
+
       - name: Restore SQLite database state
         uses: actions/cache@v4
         with:
@@ -60,16 +63,16 @@ jobs:
           EMAIL_PORT: ${{ secrets.EMAIL_PORT || '587' }}
           EMAIL_USERNAME: ${{ secrets.EMAIL_USERNAME }}
           EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
-          EMAIL_SENDER: ${{ secrets.EMAIL_SENDER }}
-          EMAIL_RECIPIENT: ${{ secrets.EMAIL_RECIPIENT }}
+          EMAIL_SENDER: ${{ secrets.EMAIL_SENDER || secrets.EMAIL_USERNAME }}
+          EMAIL_RECIPIENT: ${{ secrets.EMAIL_RECIPIENT || secrets.EMAIL_USERNAME }}
           TIMEZONE: 'Asia/Kolkata'
           DIGEST_LIMIT: '10'
           LOOKBACK_HOURS: '24'
           FALLBACK_LOOKBACK_HOURS: '48'
-          ENABLE_LLM_SUMMARIES: ${{ secrets.ENABLE_LLM_SUMMARIES || 'false' }}
+          ENABLE_LLM_SUMMARIES: ${{ secrets.ENABLE_LLM_SUMMARIES || 'true' }}
           LLM_PROVIDER: ${{ secrets.LLM_PROVIDER || 'gemini' }}
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
-          LLM_MODEL: ${{ secrets.LLM_MODEL || 'gemini-1.5-flash' }}
+          LLM_MODEL: ${{ secrets.LLM_MODEL || 'gemini-3.5-flash' }}
           DATABASE_PATH: 'data/daily_tech_brief.db'
           LOG_LEVEL: 'INFO'
         run: |

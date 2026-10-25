@@ -78,8 +78,8 @@ class LLMSummarizer(BaseSummarizer):
         self,
         provider: str = "gemini",
         api_key: str = "",
-        model: str = "gemini-1.5-flash",
-        timeout_seconds: int = 15,
+        model: str = "gemini-3.5-flash",
+        timeout_seconds: int = 30,
         session: Optional[requests.Session] = None,
     ) -> None:
         self.provider = provider.lower()

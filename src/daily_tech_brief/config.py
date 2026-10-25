@@ -76,7 +76,7 @@ class Settings:
     )
     llm_provider: str = field(default_factory=lambda: os.getenv("LLM_PROVIDER", "gemini").strip().lower())
     llm_api_key: str = field(default_factory=lambda: os.getenv("LLM_API_KEY", "").strip())
-    llm_model: str = field(default_factory=lambda: os.getenv("LLM_MODEL", "gemini-1.5-flash").strip())
+    llm_model: str = field(default_factory=lambda: (os.getenv("LLM_MODEL") or "gemini-3.5-flash").strip())
 
     # Ranking weights
     weights: RankingWeights = field(default_factory=RankingWeights)
