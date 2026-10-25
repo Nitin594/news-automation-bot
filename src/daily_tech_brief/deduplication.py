@@ -12,7 +12,11 @@ from daily_tech_brief.models import Article
 logger = logging.getLogger(__name__)
 
 PUNCT_TRANSLATOR = str.maketrans("", "", string.punctuation)
-TOKEN_RE = re.compile(r"\b[a-z0-9]{3,}\b")
+STOP_WORDS = {
+    "a", "an", "the", "and", "or", "in", "on", "at", "to", "for", "of", "with",
+    "is", "are", "was", "were", "by", "from", "its", "it", "this", "that"
+}
+TOKEN_RE = re.compile(r"\b[a-z0-9]+(?:\.[a-z0-9]+)*\b")
 
 
 def normalize_title(title: str) -> str:
@@ -23,9 +27,27 @@ def normalize_title(title: str) -> str:
     return " ".join(cleaned.split())
 
 
+def stem_token(token: str) -> str:
+    """Apply lightweight English stemming for common verb/plural suffixes."""
+    if token.endswith("ing") and len(token) > 5:
+        return token[:-3]
+    if token.endswith("ed") and len(token) > 4:
+        return token[:-2]
+    if token.endswith("es") and len(token) > 4:
+        return token[:-2]
+    if token.endswith("s") and not token.endswith("ss") and len(token) > 3:
+        return token[:-1]
+    return token
+
+
 def get_title_tokens(title: str) -> Set[str]:
-    """Extract significant lowercase word tokens from title."""
-    return set(TOKEN_RE.findall(title.lower()))
+    """Extract significant lowercase, stop-word filtered, stemmed tokens from title."""
+    words = TOKEN_RE.findall(title.lower())
+    tokens = set()
+    for w in words:
+        if w not in STOP_WORDS and len(w) >= 2:
+            tokens.add(stem_token(w))
+    return tokens
 
 
 def jaccard_similarity(set1: Set[str], set2: Set[str]) -> float:

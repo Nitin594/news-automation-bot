@@ -223,12 +223,12 @@ class ArticleRanker:
             source_counts[src] = curr_src_count + 1
             category_counts[primary_cat] = curr_cat_count + 1
 
-        # Second pass: if below minimum stories, relax strict source caps to include best remaining
+        # Second pass: if below minimum stories, relax strict source caps to reach min_stories
         if len(selected) < self.min_stories and len(candidates) > len(selected):
             for article in candidates:
                 if article not in selected:
                     selected.append(article)
-                    if len(selected) >= self.target_stories:
+                    if len(selected) >= self.min_stories:
                         break
 
         logger.info(f"Selected {len(selected)} stories (target {self.target_stories}, fallback={used_fallback})")

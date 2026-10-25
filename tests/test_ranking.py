@@ -109,6 +109,7 @@ def test_source_diversity_enforcement(ranker: ArticleRanker, ist_tz: ZoneInfo):
                 description="General news story.",
                 source_id="monopoly_source",
                 source_name="Monopoly Source",
+                categories=["software_dev"],
                 published_at=now - timedelta(hours=2),
                 first_seen_at=now,
                 relevance_score=80.0,
@@ -116,6 +117,7 @@ def test_source_diversity_enforcement(ranker: ArticleRanker, ist_tz: ZoneInfo):
             )
         )
 
+    categories_list = ["ai_and_llms", "cybersecurity", "research_and_opensource"]
     for i in range(3):
         articles.append(
             Article(
@@ -126,6 +128,7 @@ def test_source_diversity_enforcement(ranker: ArticleRanker, ist_tz: ZoneInfo):
                 description="Other valuable story.",
                 source_id=f"source_{i}",
                 source_name=f"Source {i}",
+                categories=[categories_list[i]],
                 published_at=now - timedelta(hours=3),
                 first_seen_at=now,
                 relevance_score=75.0,

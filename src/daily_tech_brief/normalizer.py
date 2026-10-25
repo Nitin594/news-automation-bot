@@ -47,12 +47,12 @@ def clean_text(raw_text: Optional[str]) -> str:
     """Safely strip HTML tags, unescape HTML entities, and normalize whitespace."""
     if not raw_text:
         return ""
+    # Decode HTML entities first so encoded tags like &lt;b&gt; are safely caught
+    unescaped = html.unescape(raw_text)
     # Strip HTML tags
-    no_html = TAG_RE.sub(" ", raw_text)
-    # Decode HTML entities
-    unescaped = html.unescape(no_html)
+    no_html = TAG_RE.sub(" ", unescaped)
     # Normalize excessive whitespace
-    return WHITESPACE_RE.sub(" ", unescaped).strip()
+    return WHITESPACE_RE.sub(" ", no_html).strip()
 
 
 def canonicalize_url(raw_url: str) -> str:

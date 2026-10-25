@@ -18,7 +18,7 @@ from daily_tech_brief.normalizer import normalize_feed_entry
 logger = logging.getLogger(__name__)
 
 USER_AGENT = "DailyTechBriefBot/1.0 (+https://github.com/daily-tech-brief)"
-MAX_RESPONSE_BYTES = 5 * 1024 * 1024  # 5 MB limit to prevent OOM
+MAX_RESPONSE_BYTES = 10 * 1024 * 1024  # 10 MB limit
 MAX_RETRIES = 2
 DEFAULT_TIMEOUT = 15
 
@@ -134,11 +134,12 @@ class FeedCollector:
 
         # Handle failure cases
         if response is None:
+            err_str = str(last_error).lower()
             logger.error(f"Failed to fetch {source.id} ({source.url}): {last_error}")
             return FetchResult(
                 source_id=source.id,
                 status_code=None,
-                status="TIMEOUT" if "Timeout" in str(last_error) else "HTTP_ERROR",
+                status="TIMEOUT" if "timeout" in err_str or "timed out" in err_str else "HTTP_ERROR",
                 duration_ms=duration_ms,
                 articles_count=0,
                 error_message=last_error or "Network failure without response",
@@ -157,11 +158,13 @@ class FeedCollector:
 
         # Enforce max content size
         content_bytes = bytearray()
+        oversized = False
         try:
             for chunk in response.iter_content(chunk_size=65536):
                 content_bytes.extend(chunk)
                 if len(content_bytes) > MAX_RESPONSE_BYTES:
-                    logger.warning(f"Source {source.id} exceeded max size limit of {MAX_RESPONSE_BYTES} bytes. Truncating.")
+                    logger.warning(f"Source {source.id} exceeded max size limit of {MAX_RESPONSE_BYTES} bytes. Aborting parse.")
+                    oversized = True
                     break
         except Exception as e:
             logger.error(f"Error reading body chunks from {source.id}: {e}")
@@ -172,6 +175,16 @@ class FeedCollector:
                 duration_ms=duration_ms,
                 articles_count=0,
                 error_message=f"Stream read failure: {e}",
+            )
+
+        if oversized:
+            return FetchResult(
+                source_id=source.id,
+                status_code=response.status_code,
+                status="OVERSIZED",
+                duration_ms=duration_ms,
+                articles_count=0,
+                error_message=f"Feed exceeded max response size of {MAX_RESPONSE_BYTES} bytes",
             )
 
         # Extract ETag & Last-Modified

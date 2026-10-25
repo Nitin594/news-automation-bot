@@ -85,7 +85,7 @@ def test_parse_timestamp_valid_iso(ist_tz: ZoneInfo):
     assert dt is not None
     # 03:30 UTC is 09:00 IST
     assert dt.hour == 9
-    assert dt.minute == 30
+    assert dt.minute == 0
 
 
 def test_parse_timestamp_missing_or_malformed(ist_tz: ZoneInfo):

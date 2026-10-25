@@ -14,6 +14,15 @@ from daily_tech_brief.scheduler import WorkflowCoordinator
 
 logger = logging.getLogger("daily_tech_brief")
 
+# Reconfigure stdout/stderr to UTF-8 on Windows consoles if supported
+try:
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    if hasattr(sys.stderr, "reconfigure"):
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+except Exception:
+    pass
+
 
 def setup_logging(level_name: str = "INFO") -> None:
     """Configure structured logging."""
@@ -48,10 +57,10 @@ def cmd_collect(coordinator: WorkflowCoordinator, args: argparse.Namespace) -> i
     print("FEED COLLECTION SUMMARY")
     print("=" * 50)
     for res in fetch_results:
-        status_symbol = "✓" if res.status in ("SUCCESS", "NOT_MODIFIED") else "✗"
-        print(f"[{status_symbol}] {res.source_id:<22} | Status: {res.status:<12} | Items: {res.articles_count:<3} | {res.duration_ms}ms")
+        status_symbol = "[OK]" if res.status in ("SUCCESS", "NOT_MODIFIED") else "[FAIL]"
+        print(f"{status_symbol:<6} {res.source_id:<22} | Status: {res.status:<12} | Items: {res.articles_count:<3} | {res.duration_ms}ms")
         if res.error_message:
-            print(f"    Error: {res.error_message}")
+            print(f"       Error: {res.error_message}")
 
     print("-" * 50)
     print(f"Total raw items fetched:       {raw_count}")
@@ -131,44 +140,44 @@ def cmd_health(coordinator: WorkflowCoordinator, args: argparse.Namespace) -> in
     validation = settings.validate_all()
 
     print("\n" + "=" * 60)
-    print(" DAILY TECH BRIEF — HEALTH CHECK")
+    print(" DAILY TECH BRIEF - HEALTH CHECK")
     print("=" * 60)
 
     # 1. Database
     db_ok = len(validation["database"]) == 0
-    print(f"[{'✓' if db_ok else '✗'}] Database: {settings.database_path}")
+    print(f"[{'OK' if db_ok else 'FAIL'}] Database: {settings.database_path}")
     for err in validation["database"]:
         print(f"    ! {err}")
 
     # 2. Timezone
     tz = settings.get_timezone()
     now_in_tz = datetime.now(tz)
-    print(f"[✓] Timezone: {tz} (Current local time: {now_in_tz.strftime('%Y-%m-%d %H:%M:%S %Z')})")
+    print(f"[OK] Timezone: {tz} (Current local time: {now_in_tz.strftime('%Y-%m-%d %H:%M:%S %Z')})")
 
     # 3. Sources
     sources_count = len(coordinator.sources_registry.get_enabled_sources())
-    print(f"[✓] Feeds Configured: {sources_count} active feeds ({settings.feeds_config_path})")
+    print(f"[OK] Feeds Configured: {sources_count} active feeds ({settings.feeds_config_path})")
 
     # 4. Telegram
     tg_ok = len(validation["telegram"]) == 0
-    print(f"[{'✓' if tg_ok else '!'}] Telegram Config: {'Ready' if tg_ok else 'Incomplete'}")
+    print(f"[{'OK' if tg_ok else 'WARN'}] Telegram Config: {'Ready' if tg_ok else 'Incomplete'}")
     for err in validation["telegram"]:
         print(f"    - {err}")
 
     # 5. Email
     em_ok = len(validation["email"]) == 0
-    print(f"[{'✓' if em_ok else '!'}] Email SMTP Config: {'Ready' if em_ok else 'Incomplete'}")
+    print(f"[{'OK' if em_ok else 'WARN'}] Email SMTP Config: {'Ready' if em_ok else 'Incomplete'}")
     for err in validation["email"]:
         print(f"    - {err}")
 
     # 6. Optional LLM
     if settings.enable_llm_summaries:
         llm_ok = len(validation["llm"]) == 0
-        print(f"[{'✓' if llm_ok else '!'}] LLM Summaries: ENABLED ({settings.llm_provider}:{settings.llm_model})")
+        print(f"[{'OK' if llm_ok else 'WARN'}] LLM Summaries: ENABLED ({settings.llm_provider}:{settings.llm_model})")
         for err in validation["llm"]:
             print(f"    - {err}")
     else:
-        print("[✓] LLM Summaries: DISABLED (Operating in 100% Free Mode with Extractive Fallback)")
+        print("[OK] LLM Summaries: DISABLED (Operating in 100% Free Mode with Extractive Fallback)")
 
     print("=" * 60 + "\n")
     return 0 if (db_ok and sources_count > 0) else 1
